@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        /* --- GLOBAL --- */
+        * {
+            box-sizing: border-box;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        /* --- CYBER BACKGROUND --- */
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            background: linear-gradient(270deg, #0f0f1b, #1a1a2e, #16213e, #0f0f1b);
+            background-size: 400% 400%;
+            animation: bgMove 12s ease infinite;
+
+            overflow: hidden;
+        }
+
+        @keyframes bgMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* --- GLOW AURA --- */
+        body::before {
+            content: "";
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+
+            background: radial-gradient(circle, rgba(0,212,255,0.15), transparent 60%);
+            animation: pulseGlow 6s infinite alternate;
+            z-index: -1;
+        }
+
+        @keyframes pulseGlow {
+            from { transform: scale(1); opacity: 0.4; }
+            to { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        /* --- CARD --- */
+        table {
+            background: rgba(15, 15, 27, 0.85);
+            backdrop-filter: blur(15px);
+
+            color: #00d4ff;
+            padding: 40px;
+            border-radius: 20px;
+
+            border: 1px solid rgba(0,212,255,0.4);
+
+            box-shadow:
+                0 0 20px rgba(0,212,255,0.2),
+                0 0 60px rgba(0,212,255,0.1),
+                inset 0 0 20px rgba(0,212,255,0.1);
+
+            font-size: 110%;
+            border-collapse: separate;
+            border-spacing: 0 20px;
+            width: 400px;
+
+            transition: 0.4s ease;
+        }
+
+        table:hover {
+            transform: translateY(-6px) scale(1.01);
+            box-shadow:
+                0 0 40px rgba(0,212,255,0.4),
+                0 0 80px rgba(0,212,255,0.2);
+        }
+
+        td {
+            padding: 5px 10px;
+        }
+
+        /* --- LABELS --- */
+        td:first-child {
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.75em;
+            color: #ff2e63;
+        }
+
+        /* --- INPUT --- */
+        input {
+            width: 100%;
+            padding: 12px;
+
+            background: rgba(22, 33, 62, 0.6);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+
+            color: #fff;
+
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #00d4ff;
+            box-shadow:
+                0 0 10px #00d4ff,
+                0 0 20px rgba(0,212,255,0.5);
+            background: rgba(22,33,62,0.8);
+        }
+
+        input::placeholder {
+            color: #666;
+            font-size: 0.75em;
+        }
+
+        /* --- BUTTON --- */
+        .button {
+            text-align: center;
+            padding-top: 20px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+
+            background: transparent;
+            border: 2px solid #00d4ff;
+            border-radius: 6px;
+
+            color: #00d4ff;
+
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 2px;
+
+            cursor: pointer;
+            transition: 0.4s;
+
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: "";
+            position: absolute;
+            width: 0%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: #00d4ff;
+            z-index: -1;
+            transition: 0.4s;
+        }
+
+        button:hover::before {
+            width: 100%;
+        }
+
+        button:hover {
+            color: #0f0f1b;
+            box-shadow:
+                0 0 20px #00d4ff,
+                0 0 40px #00d4ff;
+            transform: scale(1.03);
+        }
+
+        button:active {
+            transform: scale(0.97);
+        }
+
+        @media (max-width: 500px) {
+            table {
+                width: 95%;
+                padding: 25px;
+                font-size: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <form method="POST" action="/login_page">
+        <table>
+            <tr>
+                <td>Email</td>
+                <td><input id="email" type="email" name="email" placeholder="ACCESS_ID" required></td>
+            </tr>
+            <tr>
+                <td>Password</td>
+                <td><input id="password" type="password" name="password" placeholder="SECURE_KEY" required></td>
+            </tr>
+            <tr>
+                <td class="button" colspan="2">
+                    <button type="submit">AUTHORIZE</button>
+                </td>
+            </tr>
+        </table>
+    </form>
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music App</title>
+    <style>
+        /* --- CSS SECTION --- */
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(
+                    135deg,
+                    rgb(224, 71, 71),
+                    rgb(78, 78, 224),
+                    rgb(99, 228, 99),
+                    rgb(237, 237, 66),
+                    rgb(230, 75, 75)
+                );
+            color: white;
+            overflow: hidden; /* Prevent page scrollbars */
+
+            animation: backgroundShift 10s ease infinite;
+            background-size: 300% 300%;
+        }
+
+        @keyframes backgroundShift {
+            0%   { background-position: 0% 50%; }
+            50%  { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Hide ALL scrollbars but keep functionality */
+        ::-webkit-scrollbar { display: none; }
+        * {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .title {
+            text-align: center;
+            padding: 15px;
+            margin: 0;
+            background: linear-gradient(90deg, rgb(70, 227, 70), yellow,rgb(225, 91, 91));
+            color:black;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            padding: 20px;
+            height: calc(100vh - 180px); /* Adjusted for seeker bar */
+            overflow-y: scroll;
+        }
+
+        /* Responsive grid */
+        @media (max-width: 900px) { .grid-container { grid-template-columns: repeat(2, 1fr); } }
+
+        /* CARD */
+        .card {
+            background: #222;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 1px solid #333;
+        }
+
+        .card:hover {
+            background: #cdbd18; /* Yellow highlight from previous theme */
+            color: #111;
+            transform: translateY(-5px);
+            box-shadow: white 0px 0px 10px;
+        }
+
+        .cover { font-size: 40px; }
+        .name { margin-top: 10px; font-size: 14px; word-break: break-word; font-weight: bold; }
+
+        /* STICKY PLAYER */
+        .player-bar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: #000;
+            padding: 15px 20px;
+            display: flex;
+            flex-direction: column; /* Stacked to allow progress bar on top */
+            align-items: center;
+            border-top: 2px solid #444;
+            z-index: 1000;
+        }
+
+        .player-info-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        #nowPlaying {
+            font-size: 14px;
+            width: 30%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .controls { width: 40%; text-align: center; }
+
+        .controls button {
+            margin: 0 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .controls button:hover { background: #444; }
+
+        /* PROGRESS TRACKER CSS */
+        .tracker-container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        #progressBar {
+            flex-grow: 1;
+            cursor: pointer;
+            accent-color: #cdbd18; /* Matches theme */
+        }
+
+        .time-text { font-size: 12px; font-family: monospace; }
+    </style>
+</head>
+
+<body>
+
+<h2 class="title">🎵 My Music Player</h2>
+
+<div class="grid-container">
+    {% for song in songs %}
+    <div class="card" onclick="playSong('/music/{{ song|urlencode }}', '{{ song }}')">
+        <div class="cover">🎶</div>
+        <div class="name">{{ song }}</div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="player-bar">
+    
+    <div class="tracker-container">
+        <span class="time-text" id="currentTime">0:00</span>
+        <input type="range" id="progressBar" value="0" min="0" max="100">
+        <span class="time-text" id="durationTime">0:00</span>
+    </div>
+
+    <div class="player-info-controls">
+        <div id="nowPlaying">Select a song</div>
+
+        <audio id="audioPlayer"></audio>
+
+        <div class="controls">
+            <button onclick="togglePlay()">⏯ Play/Pause</button>
+            <button onclick="stopAudio()">⏹ Stop</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    /* --- JAVASCRIPT SECTION --- */
+    let audio = document.getElementById("audioPlayer");
+    let nowPlaying = document.getElementById("nowPlaying");
+    let progressBar = document.getElementById("progressBar");
+    let currentTimeText = document.getElementById("currentTime");
+    let durationTimeText = document.getElementById("durationTime");
+
+    function playSong(src, name) {
+        audio.src = src;
+        audio.play();
+        nowPlaying.innerText = "Now Playing: " + name;
+    }
+
+    function togglePlay() {
+        if (audio.src) {
+            if (audio.paused) {
+                audio.play();
+            } else {
+                audio.pause();
+            }
+        }
+    }
+
+    function stopAudio() {
+        audio.pause();
+        audio.currentTime = 0;
+    }
+
+    // --- TRACKER LOGIC ---
+
+    // Update progress bar as song plays
+    audio.ontimeupdate = function() {
+        if (audio.duration) {
+            // Update slider value
+            let progress = (audio.currentTime / audio.duration) * 100;
+            progressBar.value = progress;
+
+            // Update time numbers
+            currentTimeText.innerText = formatTime(audio.currentTime);
+            durationTimeText.innerText = formatTime(audio.duration);
+        }
+    };
+
+    // Seek song when user moves the slider
+    progressBar.oninput = function() {
+        if (audio.duration) {
+            let seekTime = (progressBar.value / 100) * audio.duration;
+            audio.currentTime = seekTime;
+        }
+    };
+
+    // Helper function to turn seconds into 0:00 format
+    function formatTime(seconds) {
+        let min = Math.floor(seconds / 60);
+        let sec = Math.floor(seconds % 60);
+        if (sec < 10) sec = "0" + sec;
+        return min + ":" + sec;
+    }
+</script>
+
+</body>
+</html>
