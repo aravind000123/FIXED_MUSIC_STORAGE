@@ -65,7 +65,10 @@
             font-size: 110%;
             border-collapse: separate;
             border-spacing: 0 20px;
-            width: 400px;
+            
+            /* 2. CHANGED FIXED WIDTH TO RESPONSIVE WIDTH */
+            width: 95%;
+            max-width: 400px;
 
             transition: 0.4s ease;
         }
@@ -139,6 +142,7 @@
             transition: 0.4s;
 
             position: relative;
+            z-index: 1; /* Added to keep text above background */
             overflow: hidden;
         }
 
@@ -172,7 +176,7 @@
 
         @media (max-width: 500px) {
             table {
-                width: 95%;
+                /* Width is already handled by 95% above */
                 padding: 25px;
                 font-size: 100%;
                 margin-left: 2.5%;
