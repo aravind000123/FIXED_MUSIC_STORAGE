@@ -72,11 +72,15 @@ def login_page():
         conn=sqlite3.connect("usersongs.db")
         cursor=conn.cursor()
 
+
         cursor.execute('''select password,fname from users_table where email = ?''',(email,))
         # output is getting in the TUPLE format for output so using like output[0]
         output = cursor.fetchone()
         conn.commit()
         conn.close()
+
+        if output == None:
+            return redirect('/signup')
 
         global name
         name=output[1]
